@@ -4,6 +4,7 @@ from contextlib import closing, contextmanager
 from pathlib import Path
 
 from app.business import DomainIssue
+from app.reclaim.store import RECLAIM_SCHEMA, ReclaimStore
 
 SCHEMA = '''CREATE TABLE IF NOT EXISTS runs (
     id TEXT PRIMARY KEY, report TEXT NOT NULL, created TEXT NOT NULL,
@@ -12,7 +13,7 @@ SCHEMA = '''CREATE TABLE IF NOT EXISTS runs (
 );'''
 
 
-class Store:
+class Store(ReclaimStore):
     def __init__(self, path):
         self.path = Path(path)
 
@@ -22,6 +23,7 @@ class Store:
         with closing(sqlite3.connect(self.path, timeout=15)) as db, db:
             db.row_factory = sqlite3.Row
             db.execute(SCHEMA)
+            db.executescript(RECLAIM_SCHEMA)
             yield db
 
     def register(self, run_id, report):

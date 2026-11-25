@@ -13,6 +13,7 @@
 | M5 运行对账 | 对照输入、采信和隔离行 | `POST /api/stages/balance` | `app/modules/reconcile.py` | `tests/test_reconcile.py` |
 | M6 批次复核 | 执行批次并签发或暂缓 | `POST /api/runs、PATCH /api/runs/<id>` | `app/review/service.py` | `tests/test_review.py` |
 | M7 证据交付 | 下载复核清单 | `GET /api/runs/<id>/evidence` | `app/evidence/render.py` | `tests/test_evidence.py` |
+| M8 旧文件回收 | 逐文件判定、部分放行与旧结论拒绝 | `POST /api/reclaims`、`PATCH /api/reclaims/<id>` | `app/reclaim/core.py`、`app/reclaim/service.py` | 回收规则测试 |
 
 ## 输入陷阱
 
@@ -33,5 +34,12 @@
 ## 领域反例
 
 仅使用序列不大于快照的文件。等值删除匹配分区与业务键，且序列必须大于数据；位置删除精确匹配文件与行偏移，同序列可删除。指向已知文件不存在位置的删除进入待复核。
+
+旧文件回收按位置图谱逐文件判定，不使用整批 all-or-nothing：
+
+1. 从旧位置沿换位记录一直追踪到终点；连续多次换位必须传递同一剔除结论。
+2. 任一待核行缺少唯一去向时，只挂起该行所属/所涉文件，其他已核清文件可进入 `RECLAIM`。
+3. 两个及以上不同旧位置落到同一新位置时，映射不再唯一，所有来源文件及显式候选的目标文件均挂起为 `RELOCATION_COLLISION`。
+4. 回收结论保存上游换位记录摘要/版本；确认时若摘要或版本已变化，返回 409 `STALE_RELOCATION`，必须重新判定。
 
 `sample_data/incoming.csv` 的 0003 组触发预检异常，0004 组触发业务判定。`tests/test_calculate.py` 还核对逐组结论和证据字段。

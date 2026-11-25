@@ -22,7 +22,11 @@ const labels = {READY:'通过', MISMATCH:'数值不符', PENDING:'待复核', AP
   INVALID_SAMPLE:'样本登记无效', INVALID_REGISTER:'作者登记无效', INVALID_SIMILARITY:'相似度无效',
   AUTHORITY_EXCLUSION_CONFLICT:'权威编号与禁用关系冲突', HISTORY_LIMIT:'历史窗口过长',
   DAY_OUT_OF_RANGE:'观测日超出范围', INVALID_COHORT:'入柜队列无效', PICKUP_CONFLICT:'领取记录冲突',
-  INVALID_OBSERVATION:'抽检记录无效', INVALID_SAMPLE_REGISTRY:'样本记录无效'};
+  INVALID_OBSERVATION:'抽检记录无效', INVALID_SAMPLE_REGISTRY:'样本记录无效',
+  STALE_RELOCATION:'换位记录已更新', RELOCATION_COLLISION:'换位目标冲突',
+  UNKNOWN_DESTINATION:'行去向不明', AMBIGUOUS_RELOCATION:'换位指向不唯一',
+  RELOCATION_CYCLE:'换位链路成环', FINAL_ROW_NOT_EXCLUDED:'最终行未剔除',
+  RECLAIM_NOT_FOUND:'回收结论不存在', RECLAIM_FINALIZED:'回收已确认', RECLAIM_FIELDS:'回收确认参数无效'};
 
 const valueLabels = {RPD:'相对偏差', ABSOLUTE:'绝对差', BOTH_ND:'双方未检出', MIXED_LOD:'一侧低于检出限',
   EQUALITY:'等值删除', POSITION:'位置删除', PRIMARY:'初次遮蔽', SECONDARY:'追加遮蔽',
@@ -30,7 +34,8 @@ const valueLabels = {RPD:'相对偏差', ABSOLUTE:'绝对差', BOTH_ND:'双方�
   EXACT:'完全一致', TYPE_CHANGED:'类型变化', DECIMAL_SCALE_NARROWED:'小数位收窄', NULLABILITY_NARROWED:'可空性收窄',
   MISSING_REQUIRED:'缺少必填字段', AUTHORITY_CONFLICT:'权威编号冲突', CANNOT_LINK:'禁止合并',
   UPSTREAM_UNSCHEDULED:'上游未排程', NO_FEASIBLE_SLOT:'无可用时隙', LEGAL_HOLD:'合法保全',
-  RECLAIM:'可回收', LIVE_SNAPSHOT:'活动快照', TRANSPORT:'运输中', DELIVERED:'已签收', CANCELLED:'已取消'};
+  RECLAIM:'可回收', PARTIAL_RECLAIM:'部分可回收', BLOCKED:'禁止回收', CONFIRMED:'回收已确认',
+  LIVE_SNAPSHOT:'活动快照', TRANSPORT:'运输中', DELIVERED:'已签收', CANCELLED:'已取消'};
 const headers = ['业务分组', '输入行', '计算值', '参考值', '判定'];
 
 export function badge(status) {
@@ -53,7 +58,7 @@ const fieldLabels = {matched:'匹配关系', unmet:'未覆盖', loads:'磅单明
   stockout_min:'缺货分钟', selling_min:'可售分钟', confidence:'置信度', peak_start_min:'峰窗起点',
   windows:'窗口需量', debit:'借方', credit:'贷方', resident:'本币金额', price:'汇率', matched_cents:'匹配分',
   matched_g:'匹配克数', pending:'待匹配', remaining:'剩余余额', live:'可见顺序', tombstones:'墓碑序列',
-  accounted:'已记账行', balanced:'总数平衡', input:'输入行', accepted:'采信行', isolated:'隔离行', mode:'判定方式', pass:'结论', value:'测量值', age:'龄期', picked:'领取数', censored:'删失数', risk:'在险数', remaining_bp:'剩余基点', external:'外校课程', local:'校内课程', field:'字段', ticket:'磅单', net:'净重', revenue:'收入', segment:'客群', channel:'渠道', chosen_touch:'命中触点', elapsed_min:'经过分钟', old_cents:'旧金额', new_cents:'新金额', expansion_cents:'扩张金额', contraction_cents:'收缩金额', churn_cents:'流失金额', due_cents:'应付金额', paid_cents:'已付金额', gap_cents:'差额', warnings:'提示', records:'记录数'};
+  accounted:'已记账行', balanced:'总数平衡', input:'输入行', accepted:'采信行', isolated:'隔离行', mode:'判定方式', pass:'结论', value:'测量值', age:'龄期', picked:'领取数', censored:'删失数', risk:'在险数', remaining_bp:'剩余基点', external:'外校课程', local:'校内课程', field:'字段', ticket:'磅单', net:'净重', revenue:'收入', segment:'客群', channel:'渠道', chosen_touch:'命中触点', elapsed_min:'经过分钟', old_cents:'旧金额', new_cents:'新金额', expansion_cents:'扩张金额', contraction_cents:'收缩金额', churn_cents:'流失金额', due_cents:'应付金额', paid_cents:'已付金额', gap_cents:'差额', warnings:'提示', records:'记录数', reclaimable_files:'可回收文件', blocked_files:'暂缓文件', relocation_collisions:'换位冲突', unresolved_locations:'去向未明位置', mapped_deletions:'剔除位置传递', terminal:'最终位置', path:'换位链路', state_digest:'状态摘要'};
 
 function detailValue(value) {
   if (Array.isArray(value) && value.every(item => item === null || typeof item !== 'object')) {

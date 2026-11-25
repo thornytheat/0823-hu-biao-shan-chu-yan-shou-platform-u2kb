@@ -7,3 +7,5 @@
 `PATCH /api/runs/<id>` 接收 `revision`、`status` 和 `note`。状态使用 `APPROVED` 或 `HELD`。冲突返回 409，客户端读取新版本后重试。
 
 `GET /api/runs/<id>/evidence` 下载内含运行清单、行号隔离、业务证据和复核信息的 JSON。
+
+旧文件回收使用 JSON 提交 `files`、`moves`/`relocations`、`deletions`。`POST /api/reclaim/evaluate` 只判定不入库；`POST /api/reclaims` 保存带换位记录摘要的结论，`PATCH /api/reclaims/<id>` 或 `POST /api/reclaims/<id>/confirm` 提交回收确认。上游换位记录变化后，旧摘要返回 409 `STALE_RELOCATION`。也可用 `PUT /api/relocations` 更新服务端保存的当前换位记录。
